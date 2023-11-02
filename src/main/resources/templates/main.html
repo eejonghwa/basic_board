@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html data-theme="light" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@3.9.4/dist/full.css" rel="stylesheet" type="text/css"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div class="wrap">
+    <div class="logo"><a href="/">logo</a></div>
+    <div class="content-wrap">
+        <div class="side-notebook">
+            <!--            <div th:each="notebook : ${notebookList}" th:unless="${notebook.parent != null}" th:text="${notebook.id + '_' + notebook.name}"></div>-->
+            <!--            <div th:each="notebook : ${notebookList}" th:if="${notebook.parent != null}" th:text="${notebook.id + '_' + notebook.name + notebook.parent.id}"></div>-->
+            <!--            <ul>-->
+            <!--                <li th:each="notebook : ${notebookList}"-->
+            <!--                    th:class="${notebook.id==targetNotebook.id} ? 'selected-item' : '' ">-->
+            <!--                    <a th:href="@{|/notebook/${notebook.id}|}" th:text="${notebook.name}"></a>-->
+            <!--                </li>-->
+            <!--            </ul>-->
+            <ul class="menu">
+                <li th:replace="~{/fragments :: tree(${targetNotebook}, ${notebookList})}"></li>
+            </ul>
+            <div>
+                <form action="/notebook/write" method="post">
+                    <input type="submit" value="추가">
+                </form>
+                <form action="/notebook/add-group" method="post">
+                    <input type="hidden" name="notebookId" th:value="${targetNotebook.id}">
+                    <input type="submit" value="하위노트추가">
+                </form>
+            </div>
+        </div>
+        <div class="side-page">
+            <ul>
+                <li th:each="notePage : ${notePageList}"
+                    th:class="${notePage.id==targetNotePage.id} ? 'selected-item' : '' ">
+                    <a th:href="@{|/detail/${notePage.id}|}" th:text="${notePage.title}"></a>
+                </li>
+            </ul>
+            <div>
+                <form action="/write" method="post">
+                    <input type="hidden" name="notebookId" th:value="${targetNotebook.id}">
+                    <input type="submit" value="추가">
+                </form>
+            </div>
+        </div>
+        <div class="content">
+            <form method="post">
+                <div>
+                    <input type="hidden" name="id" th:value="${targetNotePage.id}">
+                </div>
+                <div>
+                    <input type="text" name="title" th:value="${targetNotePage.title}">
+                </div>
+                <div>
+                    <textarea name="content" cols="30" rows="10" th:text="${targetNotePage.content}"></textarea>
+                </div>
+                <div>
+                    <input type="button" value="수정" onclick="updateFormAction(this, ACTIONS_UPDATE)">
+                </div>
+                <div>
+                    <input type="button" value="삭제" onclick="updateFormAction(this, ACTIONS_DELETE)">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    ACTIONS_UPDATE = {
+        'url' : '/update',
+        'msg' : '수정하시겠습니까?'
+    };
+
+    ACTIONS_DELETE = {
+        'url' : '/delete',
+        'msg' : '삭제하시겠습니까?'
+    };
+
+    function updateFormAction(input, action){
+        if(confirm(action.msg)){
+            input.form.action = action.url;
+            input.form.submit();
+        }
+    }
+
+</script>
+</body>
+</html>
